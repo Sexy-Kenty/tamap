@@ -1,5 +1,12 @@
 <h2>Tamap</h2>
-<div id='map'></div>
+
+<!-- 地名入力用のinputを追加 -->
+<input id="address" type="textbox">
+
+<!-- buttonをクリックしたらcodeAddressを実行　-->
+<input type="button" value="Encode" onclick="codeAddress()">
+<div id='map'>
+</div>
 
 <style>
   #map{
@@ -8,11 +15,44 @@
 </style>
 
 <script>
+    /*
+    mapを関数の外で定義(codeAddressでも使うため)
+    geocoderを用意
+    */
+
+    let map
+    let geocoder
+
     function initMap(){
-        let map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 35.658333, lng: 139.701697},
-            zoom: 12
+        // geocoderを初期化
+        geocoder = new google.maps.Geocoder()
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 35.645753, lng: 139.747788},
+            zoom: 14
+        });
+    }
+
+    function codeAddress(){
+        // 入力を取得
+        let inputAddress = document.getElementById('address').value;
+
+        // geocodingしたあとmapを移動
+        geocoder.geocode( { 'address': inputAddress}, function(results, status) {
+            if (status == 'OK') {
+                // map.setCenterで地図が移動
+                map.setCenter(results[0].geometry.location);
+
+                // google.maps.MarkerでGoogleMap上の指定位置にマーカが立つ
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+            } else {
+                alert('Geocode was not successful for the following reason: ' + status);
+            }
         });
     }
 </script>
+
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwmzwKVX6bUpitFjKc9usUAdLErUASpb4&callback=initMap" async defer></script>
